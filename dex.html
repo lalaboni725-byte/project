@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101827">
+
+    <title>PlayZone - Game Profile</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6c63ff;
+            --background: #101827;
+            --card: #1b2638;
+            --text: #ffffff;
+            --muted: #9caac0;
+            --border: #2b384d;
+            --gold: #ffc857;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, var(--background));
+            color: var(--tg-theme-text-color, var(--text));
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 18px 14px;
+        }
+
+        button {
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .online {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 11px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            background: #35d49a;
+            border-radius: 50%;
+        }
+
+        /* Profile card */
+
+        .profile-card {
+            padding: 22px 18px;
+            border-radius: 22px;
+            background:
+                linear-gradient(145deg, #252b59, #263d65 60%, #214b60);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 1px solid #ffffff20;
+            right: -75px;
+            top: -90px;
+            box-shadow:
+                0 0 0 25px #ffffff08,
+                0 0 0 50px #ffffff05;
+            pointer-events: none;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar {
+            width: 76px;
+            height: 76px;
+            flex-shrink: 0;
+            border-radius: 22px;
+            border: 3px solid #ffffff65;
+            background: linear-gradient(145deg, #ffd16d, #f08b65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 39px;
+        }
+
+        .profile-details {
+            min-width: 0;
+        }
+
+        .welcome {
+            color: #d1dafa;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            margin-bottom: 5px;
+        }
+
+        .username {
+            font-size: 23px;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+            margin-bottom: 7px;
+        }
+
+        .rank {
+            display: inline-block;
+            padding: 5px 9px;
+            background: #ffffff1c;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        /* Level progress */
+
+        .level-section {
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .xp-track {
+            height: 9px;
+            background: #ffffff30;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            width: 68%;
+            height: 100%;
+            background: linear-gradient(90deg, #ffbd59, #ffe28a);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .xp-hint {
+            font-size: 11px;
+            color: #d1dafa;
+            margin-top: 9px;
+        }
+
+        /* Statistics */
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 13px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .stat-card {
+            min-width: 0;
+            padding: 15px 8px;
+            border: 1px solid var(--tg-theme-section-separator-color, var(--border));
+            border-radius: 16px;
+            background: var(--tg-theme-secondary-bg-color, var(--card));
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 23px;
+            margin-bottom: 9px;
+        }
+
+        .stat-value {
+            font-size: 21px;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-label {
+            color: var(--tg-theme-hint-color, var(--muted));
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* Coin wallet */
+
+        .wallet {
+            margin-top: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 17px;
+            border: 1px solid var(--tg-theme-section-separator-color, var(--border));
+            background: var(--tg-theme-secondary-bg-color, var(--card));
+        }
+
+        .coin-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: #493d24;
+            font-size: 27px;
+        }
+
+        .wallet-info {
+            min-width: 0;
+        }
+
+        .coin-balance {
+            font-size: 23px;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+
+        .wallet-label {
+            font-size: 11px;
+            color: var(--tg-theme-hint-color, var(--muted));
+            margin-top: 4px;
+        }
+
+        .earn-button {
+            min-height: 44px;
+            padding: 0 13px;
+            margin-left: auto;
+            border: none;
+            border-radius: 11px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Achievements */
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .achievement {
+            padding: 14px 6px;
+            border-radius: 15px;
+            border: 1px solid var(--tg-theme-section-separator-color, var(--border));
+            background: var(--tg-theme-secondary-bg-color, var(--card));
+            text-align: center;
+            min-width: 0;
+        }
+
+        .achievement-icon {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .achievement-name {
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .achievement-desc {
+            font-size: 10px;
+            color: var(--tg-theme-hint-color, var(--muted));
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        /* Navigation */
+
+        .navigation {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 9px;
+            margin-top: 24px;
+        }
+
+        .nav-button {
+            min-height: 52px;
+            padding: 8px 4px;
+            border: 1px solid var(--tg-theme-section-separator-color, var(--border));
+            border-radius: 13px;
+            background: var(--tg-theme-secondary-bg-color, var(--card));
+            color: var(--tg-theme-text-color, var(--text));
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .nav-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        button:focus-visible {
+            outline: 3px solid #8b85ff;
+            outline-offset: 3px;
+        }
+
+        .status {
+            min-height: 20px;
+            margin-top: 14px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--tg-theme-hint-color, var(--muted));
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-bottom: 8px;
+            color: var(--tg-theme-hint-color, var(--muted));
+            font-size: 11px;
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding: 14px 10px;
+            }
+
+            .profile-card {
+                padding: 18px 14px;
+            }
+
+            .avatar {
+                width: 62px;
+                height: 62px;
+                font-size: 32px;
+                border-radius: 18px;
+            }
+
+            .username {
+                font-size: 20px;
+            }
+
+            .stat-value {
+                font-size: 18px;
+            }
+
+            .stat-card {
+                padding: 13px 5px;
+            }
+
+            .wallet {
+                gap: 8px;
+                padding: 11px;
+            }
+
+            .coin-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 23px;
+            }
+
+            .earn-button {
+                padding: 0 9px;
+                font-size: 11px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">⚡ PLAY<span>ZONE</span></div>
+
+        <div class="online">
+            <span class="online-dot"></span>
+            Player Profile
+        </div>
+    </header>
+
+    <!-- Profile -->
+    <section class="profile-card">
+
+        <div class="profile-info">
+
+            <div class="avatar" aria-label="Player avatar">
+                🦊
+            </div>
+
+            <div class="profile-details">
+                <div class="welcome">Welcome back</div>
+
+                <div class="username" id="username">
+                    PlayerOne
+                </div>
+
+                <div class="rank" id="rank">
+                    🛡️ Silver Adventurer
+                </div>
+            </div>
+
+        </div>
+
+        <div class="level-section">
+
+            <div class="level-info">
+                <span>LEVEL <span id="level">12</span></span>
+
+                <span>
+                    <span id="xp">680</span> / 1000 XP
+                </span>
+            </div>
+
+            <div
+                class="xp-track"
+                id="xpProgress"
+                role="progressbar"
+                aria-label="Experience progress"
+                aria-valuemin="0"
+                aria-valuemax="1000"
+                aria-valuenow="680"
+            >
+                <div class="xp-fill" id="xpFill"></div>
+            </div>
+
+            <div class="xp-hint" id="xpHint">
+                320 XP until Level 13
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="section">
+
+        <h2 class="section-title">📊 Your Statistics</h2>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="wins">48</div>
+                <div class="stat-label">Victories</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-value" id="games">76</div>
+                <div class="stat-label">Games Played</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-value" id="winRate">63%</div>
+                <div class="stat-label">Win Rate</div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Wallet -->
+    <section class="wallet">
+
+        <div class="coin-icon">🪙</div>
+
+        <div class="wallet-info">
+            <div class="coin-balance" id="coins">2,450</div>
+            <div class="wallet-label">Your Coin Balance</div>
+        </div>
+
+        <button class="earn-button" id="earnButton" type="button">
+            Earn +100
+        </button>
+
+    </section>
+
+    <!-- Achievements -->
+    <section class="section">
+
+        <h2 class="section-title">🎖️ Achievements</h2>
+
+        <div class="achievements">
+
+            <div class="achievement">
+                <div class="achievement-icon">🔥</div>
+                <div class="achievement-name">On Fire</div>
+                <div class="achievement-desc">
+                    Win 5 games in a row
+                </div>
+            </div>
+
+            <div class="achievement">
+                <div class="achievement-icon">🥇</div>
+                <div class="achievement-name">Champion</div>
+                <div class="achievement-desc">
+                    Win 25 matches
+                </div>
+            </div>
+
+            <div class="achievement">
+                <div class="achievement-icon">💎</div>
+                <div class="achievement-name">Collector</div>
+                <div class="achievement-desc">
+                    Earn 2,000 coins
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Navigation -->
+    <nav class="navigation" aria-label="Game navigation">
+
+        <button class="nav-button active" data-page="play" type="button">
+            🎮 Play
+        </button>
+
+        <button class="nav-button" data-page="leaderboard" type="button">
+            🏆 Ranking
+        </button>
+
+        <button class="nav-button" data-page="settings" type="button">
+            ⚙️ Settings
+        </button>
+
+    </nav>
+
+    <div class="status" id="status" role="status" aria-live="polite">
+        Welcome to PlayZone!
+    </div>
+
+    <footer class="footer">
+        PLAYZONE · Your adventure starts here
+    </footer>
+
+</div>
+
+<script>
+    // Initialize Telegram Mini App
+    const tg = window.Telegram?.WebApp;
+
+    if (tg) {
+        tg.ready();
+        tg.expand();
+    }
+
+    // Demo player data
+    let coins = 2450;
+    let xp = 680;
+    let level = 12;
+
+    const usernameElement = document.getElementById("username");
+    const statusElement = document.getElementById("status");
+
+    // Update the profile display
+    function updateProfile() {
+        document.getElementById("coins").textContent =
+            coins.toLocaleString();
+
+        document.getElementById("xp").textContent = xp;
+
+        document.getElementById("level").textContent = level;
+
+        document.getElementById("xpFill").style.width =
+            (xp / 1000 * 100) + "%";
+
+        document.getElementById("xpProgress").setAttribute(
+            "aria-valuenow",
+            xp
+        );
+
+        document.getElementById("xpHint").textContent =
+            (1000 - xp) + " XP until Level " + (level + 1);
+
+        let rank = "🥉 Bronze Explorer";
+
+        if (level >= 20) {
+            rank = "🏆 Gold Champion";
+        } else if (level >= 10) {
+            rank = "🛡️ Silver Adventurer";
+        }
+
+        document.getElementById("rank").textContent = rank;
+    }
+
+    // Earn coins and experience
+    document.getElementById("earnButton").addEventListener(
+        "click",
+        function() {
+            coins += 100;
+            xp += 50;
+
+            let leveledUp = false;
+
+            if (xp >= 1000) {
+                xp -= 1000;
+                level++;
+                leveledUp = true;
+            }
+
+            updateProfile();
+
+            if (leveledUp) {
+                statusElement.textContent =
+                    "🎉 Level up! You reached Level " + level +
+                    " and earned 100 coins!";
+            } else {
+                statusElement.textContent =
+                    "🪙 +100 coins and +50 XP earned!";
+            }
+        }
+    );
+
+    // Navigation buttons
+    document.querySelectorAll(".nav-button").forEach(button => {
+        button.addEventListener("click", function() {
+
+            document.querySelectorAll(".nav-button").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+            const page = this.dataset.page;
+
+            if (page === "play") {
+                statusElement.textContent =
+                    "🎮 Play selected! Connect your game engine to start playing.";
+            }
+
+            if (page === "leaderboard") {
+                statusElement.textContent =
+                    "🏆 Leaderboard preview: Your demo rank is #128.";
+            }
+
+            if (page === "settings") {
+                const newName = prompt(
+                    "Enter your display name:",
+                    usernameElement.textContent
+                );
+
+                if (newName !== null) {
+                    const name = newName.trim();
+
+                    if (name.length >= 3 && name.length <= 20) {
+                        usernameElement.textContent = name;
+
+                        statusElement.textContent =
+                            "✅ Your display name has been updated.";
+                    } else {
+                        statusElement.textContent =
+                            "Name must contain 3–20 characters.";
+                    }
+                }
+            }
+        });
+    });
+
+    // Initial render
+    updateProfile();
+</script>
+
+</body>
+</html>
