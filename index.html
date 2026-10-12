@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+    <title>Register | Telegram Mini App</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #229ED9;
+            --primary-dark: #168ac0;
+            --radius: 16px;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+
+            background: var(--tg-theme-bg-color, #f4f7fb);
+            color: var(--tg-theme-text-color, #17212b);
+
+            min-height: 100vh;
+            min-height: 100dvh;
+
+            padding:
+                max(20px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(20px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
+        }
+
+        .card {
+            width: 100%;
+            padding: 28px 22px;
+            border-radius: 24px;
+
+            background: var(
+                --tg-theme-secondary-bg-color,
+                #ffffff
+            );
+
+            border: 1px solid var(
+                --tg-theme-section-separator-color,
+                #e8edf2
+            );
+
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--primary);
+            color: #ffffff;
+
+            border-radius: 19px;
+            margin-bottom: 22px;
+
+            font-size: 30px;
+        }
+
+        .eyebrow {
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 9px;
+        }
+
+        h1 {
+            font-size: clamp(25px, 7vw, 31px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            line-height: 1.65;
+
+            color: var(
+                --tg-theme-hint-color,
+                #72808e
+            );
+
+            margin-bottom: 27px;
+        }
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .input-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+
+            height: 52px;
+            padding: 0 14px;
+
+            border: 1px solid var(
+                --tg-theme-section-separator-color,
+                #dce3eb
+            );
+
+            border-radius: 13px;
+
+            background: var(
+                --tg-theme-bg-color,
+                #ffffff
+            );
+
+            color: var(
+                --tg-theme-text-color,
+                #17212b
+            );
+
+            outline: none;
+            font-size: 16px;
+
+            transition: border-color 0.2s;
+        }
+
+        input::placeholder {
+            color: var(
+                --tg-theme-hint-color,
+                #929eaa
+            );
+
+            opacity: 0.8;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(34, 158, 217, 0.12);
+        }
+
+        .input-wrap input {
+            padding-right: 76px;
+        }
+
+        .toggle {
+            position: absolute;
+            right: 6px;
+            top: 5px;
+
+            height: 42px;
+            min-width: 58px;
+            padding: 0 8px;
+
+            border: 0;
+            border-radius: 9px;
+
+            background: transparent;
+            color: var(--primary);
+
+            font-size: 13px;
+            font-weight: 700;
+
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .toggle:active {
+            background: rgba(34, 158, 217, 0.1);
+        }
+
+        .hint {
+            margin-top: 8px;
+
+            font-size: 12px;
+            line-height: 1.5;
+
+            color: var(
+                --tg-theme-hint-color,
+                #72808e
+            );
+        }
+
+        .strength {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .strength span {
+            height: 4px;
+            flex: 1;
+            border-radius: 5px;
+            background: var(
+                --tg-theme-section-separator-color,
+                #e0e6ed
+            );
+        }
+
+        .strength span.active {
+            background: var(--primary);
+        }
+
+        .submit-btn {
+            width: 100%;
+            min-height: 53px;
+
+            border: none;
+            border-radius: 13px;
+
+            margin-top: 3px;
+            padding: 14px;
+
+            background: var(
+                --tg-theme-button-color,
+                #229ED9
+            );
+
+            color: var(
+                --tg-theme-button-text-color,
+                #ffffff
+            );
+
+            font-size: 16px;
+            font-weight: 750;
+
+            cursor: pointer;
+            touch-action: manipulation;
+
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.985);
+        }
+
+        .submit-btn:focus-visible,
+        .toggle:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        .message {
+            display: none;
+            padding: 13px;
+            margin-top: 17px;
+
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #e5f8ec;
+            color: #176b36;
+        }
+
+        .message.error {
+            background: #ffeded;
+            color: #b42323;
+        }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+
+            font-size: 12px;
+            line-height: 1.6;
+
+            color: var(
+                --tg-theme-hint-color,
+                #72808e
+            );
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .card {
+                padding: 23px 17px;
+                border-radius: 19px;
+            }
+
+            .subtitle {
+                margin-bottom: 22px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="app">
+        <section class="card">
+
+            <div class="logo" aria-hidden="true">✈</div>
+
+            <p class="eyebrow">Telegram Mini App</p>
+
+            <h1>Create your account</h1>
+
+            <p class="subtitle">
+                Join us today. Enter your details below
+                to get started.
+            </p>
+
+            <form id="registerForm">
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username</label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="32"
+                        pattern="[A-Za-z0-9_]+"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        required
+                    >
+
+                    <p class="hint">
+                        3–32 letters, numbers, or underscores.
+                    </p>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <div class="input-wrap">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button
+                            class="toggle"
+                            type="button"
+                            data-target="password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
+
+                    <div class="strength" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <p class="hint" id="strengthText">
+                        Use at least 8 characters.
+                    </p>
+                </div>
+
+                <!-- Repeat Password -->
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        Repeat Password
+                    </label>
+
+                    <div class="input-wrap">
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Enter password again"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="toggle"
+                            type="button"
+                            data-target="confirmPassword"
+                            aria-label="Show repeated password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Create Account &nbsp; →
+                </button>
+
+                <div
+                    id="message"
+                    class="message"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+            </form>
+
+            <p class="footer">
+                Secure registration experience
+                <br>
+                Powered by Telegram Mini App
+            </p>
+
+        </section>
+    </main>
+
+    <script>
+        // Telegram Mini App initialization
+        const tg = window.Telegram?.WebApp;
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const form = document.getElementById("registerForm");
+        const username = document.getElementById("username");
+        const password = document.getElementById("password");
+        const confirmPassword =
+            document.getElementById("confirmPassword");
+
+        const message = document.getElementById("message");
+        const strengthText =
+            document.getElementById("strengthText");
+
+        const strengthBars =
+            document.querySelectorAll(".strength span");
+
+        // Show and hide password
+        document.querySelectorAll(".toggle").forEach(button => {
+            button.addEventListener("click", () => {
+                const input = document.getElementById(
+                    button.dataset.target
+                );
+
+                const show = input.type === "password";
+
+                input.type = show ? "text" : "password";
+                button.textContent = show ? "Hide" : "Show";
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(show)
+                );
+
+                button.setAttribute(
+                    "aria-label",
+                    (show ? "Hide " : "Show ") +
+                    (input.id === "password"
+                        ? "password"
+                        : "repeated password")
+                );
+            });
+        });
+
+        // Password strength indicator
+        password.addEventListener("input", () => {
+            const value = password.value;
+            let score = 0;
+
+            if (value.length >= 8) score++;
+            if (/[a-z]/.test(value) && /[A-Z]/.test(value)) {
+                score++;
+            }
+            if (/[0-9]/.test(value)) score++;
+            if (/[^A-Za-z0-9]/.test(value)) score++;
+
+            strengthBars.forEach((bar, index) => {
+                bar.classList.toggle("active", index < score);
+            });
+
+            if (!value) {
+                strengthText.textContent =
+                    "Use at least 8 characters.";
+            } else if (score <= 1) {
+                strengthText.textContent =
+                    "Try a longer password with more variety.";
+            } else if (score === 2) {
+                strengthText.textContent =
+                    "Getting stronger. Add more variety.";
+            } else if (score === 3) {
+                strengthText.textContent =
+                    "Good password variety.";
+            } else {
+                strengthText.textContent =
+                    "Great password variety.";
+            }
+        });
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = "message show " + type;
+        }
+
+        // Registration validation
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+
+            message.className = "message";
+            message.textContent = "";
+
+            const cleanUsername = username.value.trim();
+
+            if (!/^[A-Za-z0-9_]{3,32}$/.test(cleanUsername)) {
+                showMessage(
+                    "Username must contain 3–32 letters, numbers, or underscores.",
+                    "error"
+                );
+
+                username.focus();
+                return;
+            }
+
+            if (password.value.length < 8) {
+                showMessage(
+                    "Password must contain at least 8 characters.",
+                    "error"
+                );
+
+                password.focus();
+                return;
+            }
+
+            if (password.value !== confirmPassword.value) {
+                showMessage(
+                    "Passwords do not match. Please try again.",
+                    "error"
+                );
+
+                confirmPassword.focus();
+                return;
+            }
+
+            showMessage(
+                "Form validated successfully! Connect a backend to create your account.",
+                "success"
+            );
+        });
+    </script>
+
+</body>
+</html>
